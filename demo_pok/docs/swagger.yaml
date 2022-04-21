@@ -1,0 +1,181 @@
+swagger: "2.0"
+info:
+  description: "This document describes the API interface for pokemon insurance system."
+  version: "1.0.0"
+  title: "Pokemon insurance"
+schemes:
+- "http"
+paths:
+  /trainer:
+    post:
+      tags:
+      - "trainer"
+      summary: "Request to register a trainer."
+      description: "This ent point is used to register a new trainer."
+      operationId: "addTrainer"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Trainer"
+      responses:
+        "201":
+          description: "Resource created"
+          schema:
+            $ref: "#/definitions/TrainerResponce"
+        "400":
+          description: "Error on input request"
+        "405":
+          description: "Method Not Allowed"
+        "409":
+          description: "Resource already exist"
+        "500":
+          description: "Internal server error"
+  /quote:
+    post:
+      tags:
+      - "quote"
+      summary: "Generate new quote for a pokemon."
+      description: "This end-point is used to create a new quote for a pokemon. The quote will be done only if the pokemon related category is enabled to the insurance."
+      operationId: "addQuote"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: header
+        description: "Unique auth code to use for interact with API. It's unique for each trainer"
+        name: mt
+        type : integer
+        required: true
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Quote"
+      responses:
+        "201":
+          description: "Resource created"
+          schema:
+           $ref: "#/definitions/QuoteResponce"
+        "400":
+          description: " Three different message code are return. - Error on input request - in case of it's missing the required input parameter. - Error while fetch pokemon info. Please check your connection or insert valid pokemon name - in case the pokemon name is invalid or the service is unavailable. - This category is not covered by insurance - when the pokemon is not enabled to be insured. "
+        "401":
+          description: "MT token is not valid"
+        "405":
+          description: "Method Not Allowed"
+        "409":
+          description: "Resource already exist"
+        "500":
+          description: "Internal server error"
+
+  /payedQuote:
+    post:
+      tags:
+      - "payedQuote"
+      summary: "Pay an existing pokemon quote"
+      description: "This end-point is used to pay a quote."
+      operationId: "addPayedQuote"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: header
+        description: "Unique auth code to use for interact with API. It's unique for each trainer"
+        name: mt
+        type : integer
+        required: true
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/PayedQuote"
+      responses:
+        "201":
+          description: "Resource created"
+          schema:
+           $ref: "#/definitions/PayedResponce"
+        "400":
+          description: " Two different message code are return. - Error on input request - in case of it's missing the required input parameter. - Payment failed - in case of the payment is rejected."
+        "401":
+          description: "MT token is not valid"
+        "404":
+          description: "Doesn't exist a quote for this pokemon"
+        "405":
+          description: "Method Not Allowed"
+        "500":
+          description: "Internal server error"
+
+definitions:
+  Trainer:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      surname:
+        type: "string"
+      idtrainer:
+        type: "string"
+  Quote:
+    type: "object"
+    properties:
+      pokemon:
+        type: "string"
+  PayedQuote:
+    type: "object"
+    properties:
+      pokemon:
+        type: "string"
+  TrainerResponce:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "test"
+      surname:
+        type: "string"
+      idtrainer:
+        type: integer
+        example: 24
+      mt:
+        type: integer
+        example: 25
+  QuoteResponce:
+    type: "object"
+    properties:
+      pokemon: 
+        type: "string"
+        example: "bulbasaur"
+      price:
+        type: number
+        example: 9.5
+      id:
+        type: integer
+        example: 24
+  PayedResponce:
+    type: "object"
+    properties:
+      pokemon: 
+        type: "string"
+        example: "bulbasaur"
+      price:
+        type: number
+        example: 9.5
+      idtrainer:
+        type: integer
+        example: 24
+      idTransaction:
+        type: integer
+        example: 2433786
+      timestamp:
+        type: "string"
+        format: "date-time"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
